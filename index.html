@@ -1,0 +1,168 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>FeedMe</title>
+  <!-- Swiper CSS for touch gestures -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.css" />
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+      background-color: #0f172a;
+      color: #f8fafc;
+      height: 100vh;
+      overflow: hidden;
+    }
+    .header {
+      height: 50px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 20px;
+      background: #1e293b;
+      border-bottom: 1px solid #334155;
+    }
+    .header h1 { font-size: 1.2rem; color: #38bdf8; letter-spacing: 0.5px; }
+    .swiper { width: 100%; height: calc(100vh - 50px); }
+    .swiper-slide {
+      display: flex;
+      justify-content: center;
+      padding: 15px;
+    }
+    .card {
+      background: #1e293b;
+      width: 100%;
+      max-width: 500px;
+      border-radius: 16px;
+      padding: 24px;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.5);
+      border: 1px solid #334155;
+      overflow-y: auto;
+    }
+    .category {
+      font-size: 0.75rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      color: #38bdf8;
+      margin-bottom: 8px;
+    }
+    .title {
+      font-size: 1.35rem;
+      font-weight: 700;
+      margin-bottom: 16px;
+      line-height: 1.3;
+      color: #ffffff;
+    }
+    .content {
+      font-size: 0.95rem;
+      line-height: 1.6;
+      color: #cbd5e1;
+      margin-bottom: 20px;
+      white-space: pre-line;
+    }
+    .footer {
+      border-top: 1px solid #334155;
+      padding-top: 16px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+    .source-link {
+      color: #38bdf8;
+      text-decoration: none;
+      font-size: 0.85rem;
+      font-weight: 600;
+    }
+    .actions { display: flex; gap: 12px; }
+    .btn {
+      background: #334155;
+      border: none;
+      color: #fff;
+      padding: 8px 12px;
+      border-radius: 8px;
+      cursor: pointer;
+      font-size: 1rem;
+    }
+    .btn:active { background: #38bdf8; }
+    .loading { text-align: center; margin-top: 40vh; color: #94a3b8; }
+  </style>
+</head>
+<body>
+
+  <div class="header">
+    <h1>FeedMe 🍽️</h1>
+  </div>
+
+  <div id="app">
+    <div class="loading">Loading your fresh feed...</div>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.js"></script>
+  <script>
+    // Paste your Google Apps Script Web App URL here
+    const FEED_API_URL = "https://script.google.com/macros/s/AKfycbwjlWMzricTk_dQEthEhUiOXYOq3one9kmSb0NHe0U1IxgRdoYxNFdEkoMicIMQocdC/exec";
+
+    async function loadFeed() {
+      try {
+        const response = await fetch(FEED_API_URL);
+        const posts = await response.json();
+        
+        if (!posts || posts.length === 0) {
+          document.getElementById('app').innerHTML = '<div class="loading">No posts available today.</div>';
+          return;
+        }
+
+        let slidesHtml = '';
+        posts.forEach(post => {
+          slidesHtml += `
+            <div class="swiper-slide">
+              <div class="card">
+                <div>
+                  <div class="category">${post.category || 'General'}</div>
+                  <h2 class="title">${post.title}</h2>
+                  <div class="content">${post.content}</div>
+                </div>
+                <div class="footer">
+                  ${post.source_url ? `<a href="${post.source_url}" target="_blank" class="source-link">🔗 Read on ${post.source_name || 'Source'}</a>` : `<span>${post.source_name || ''}</span>`}
+                  <div class="actions">
+                    <button class="btn" onclick="rate('up')">👍</button>
+                    <button class="btn" onclick="rate('down')">👎</button>
+                  </div>
+                </div>
+              </div>
+            </div>
+          `;
+        });
+
+        document.getElementById('app').innerHTML = `
+          <div class="swiper">
+            <div class="swiper-wrapper">
+              ${slidesHtml}
+            </div>
+          </div>
+        `;
+
+        new Swiper('.swiper', {
+          direction: 'horizontal',
+          loop: false,
+          spaceBetween: 10,
+        });
+
+      } catch (err) {
+        document.getElementById('app').innerHTML = '<div class="loading">Error loading feed. Check Web App URL.</div>';
+      }
+    }
+
+    function rate(type) {
+      alert(type === 'up' ? 'Liked!' : 'Disliked!');
+    }
+
+    loadFeed();
+  </script>
+</body>
+</html>
