@@ -1,204 +1,53 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-  <title>FeedMe</title>
-  
-  <!-- App Icon for iOS & Android Home Screen -->
-  <link rel="apple-touch-icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 512 512'><rect width='512' height='512' rx='128' fill='%230f172a'/><text x='50%' y='68%' font-size='320' font-family='sans-serif' font-weight='bold' fill='%2338bdf8' text-anchor='middle'>✦</text></svg>">
-  <meta name="apple-mobile-web-app-capable" content="yes">
-  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-
-  <!-- Swiper CSS -->
-  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.css" />
-  <style>
-    * { box-sizing: border-box; margin: 0; padding: 0; }
-    body {
-      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
-      background-color: #0f172a;
-      color: #f8fafc;
-      height: 100vh;
-      overflow: hidden;
-      user-select: none;
-    }
-    .header {
-      height: 56px;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      padding: 0 16px;
-      background: #1e293b;
-      border-bottom: 1px solid #334155;
-    }
-    .logo {
-      font-size: 1.2rem;
-      font-weight: 800;
-      color: #38bdf8;
-      letter-spacing: 0.5px;
-    }
-    .nav-tabs {
-      display: flex;
-      gap: 6px;
-      background: #0f172a;
-      padding: 4px;
-      border-radius: 10px;
-      border: 1px solid #334155;
-    }
-    .tab-btn {
-      background: transparent;
-      border: none;
-      color: #94a3b8;
-      padding: 6px 12px;
-      font-size: 0.75rem;
-      font-weight: 700;
-      border-radius: 6px;
-      cursor: pointer;
-      text-transform: uppercase;
-      letter-spacing: 0.5px;
-      transition: all 0.2s;
-    }
-    .tab-btn.active {
-      background: #38bdf8;
-      color: #0f172a;
-    }
-    .swiper { width: 100%; height: calc(100vh - 56px); }
-    .swiper-slide {
-      display: flex;
-      justify-content: center;
-      padding: 12px 12px 28px 12px;
-    }
-    .card {
-      background: #1e293b;
-      width: 100%;
-      max-width: 500px;
-      border-radius: 18px;
-      padding: 24px 20px 24px 20px;
-      display: flex;
-      flex-direction: column;
-      justify-content: space-between;
-      box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.5);
-      border: 1px solid #334155;
-      overflow-y: auto;
-    }
-    .category {
-      font-size: 0.8rem;
-      font-weight: 700;
-      text-transform: uppercase;
-      color: #38bdf8;
-      margin-bottom: 10px;
-      letter-spacing: 0.5px;
-    }
-    .title {
-      font-size: 1.35rem;
-      font-weight: 700;
-      margin-bottom: 16px;
-      line-height: 1.35;
-      color: #ffffff;
-    }
-    .content {
-      font-size: 1.1rem;
-      line-height: 1.65;
-      color: #cbd5e1;
-      margin-bottom: 24px;
-      white-space: pre-line;
-      user-select: text;
-    }
-    .footer {
-      border-top: 1px solid #334155;
-      padding-top: 16px;
-      padding-bottom: 8px;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      gap: 12px;
-    }
-    .source-link {
-      color: #38bdf8;
-      text-decoration: none;
-      font-size: 0.88rem;
-      font-weight: 600;
-      word-break: break-word;
-    }
-    .actions { display: flex; gap: 10px; shrink: 0; }
-    .btn {
-      background: #334155;
-      border: 1px solid #475569;
-      color: #fff;
-      padding: 10px 14px;
-      border-radius: 10px;
-      cursor: pointer;
-      font-size: 1.1rem;
-    }
-    .btn:active { background: #38bdf8; }
-    .loading { text-align: center; margin-top: 40vh; color: #94a3b8; font-size: 1.1rem; }
-  </style>
-</head>
-<body>
-
-  <div class="header">
-    <div class="logo">FeedMe ✦</div>
-    <div class="nav-tabs">
-      <button class="tab-btn active" id="tab-inform" onclick="switchTab('inform')">Inform</button>
-      <button class="tab-btn" id="tab-learn" onclick="switchTab('learn')">Learn</button>
-      <button class="tab-btn" id="tab-life" onclick="switchTab('life')">Life</button>
-    </div>
-  </div>
-
-  <div id="app">
-    <div class="loading">Loading your fresh feed...</div>
-  </div>
-
-  <script src="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.js"></script>
   <script>
-    const FEED_API_URL = "https://script.google.com/macros/s/AKfycbwjlWMzricTk_dQEthEhUiOXYOq3one9kmSb0NHe0U1IxgRdoYxNFdEkoMicIMQocdC/exec"; // <-- Paste Web App URL here
+    const FEED_API_URL = "https://script.google.com/macros/s/AKfycbwjlWMzricTk_dQEthEhUiOXYOq3one9kmSb0NHe0U1IxgRdoYxNFdEkoMicIMQocdC/exec"; // <-- Ensure your Web App URL is here
     
     let feedData = { inform: [], learn: [], life: [] };
     let currentTab = 'inform';
     let swiperInstance = null;
     let longPressTimer = null;
 
-async function fetchFeedData() {
-  try {
-    const cacheBuster = `?t=${new Date().getTime()}`;
-    const response = await fetch(FEED_API_URL + cacheBuster);
+    async function fetchFeedData() {
+      try {
+        const response = await fetch(FEED_API_URL);
+        
+        if (!response.ok) {
+          throw new Error(`HTTP Error: ${response.status}`);
+        }
 
-    if (!response.ok) {
-      throw new Error(`HTTP Status ${response.status}`);
+        // Use .text() first to prevent response.json() syntax crashes
+        const textData = await response.text();
+        let parsed = JSON.parse(textData);
+
+        // Handle double-stringified JSON if returned by Apps Script
+        if (typeof parsed === 'string') {
+          parsed = JSON.parse(parsed);
+        }
+
+        feedData = {
+          inform: Array.isArray(parsed.inform) ? parsed.inform : [],
+          learn:  Array.isArray(parsed.learn)  ? parsed.learn  : [],
+          life:   Array.isArray(parsed.life)   ? parsed.life   : []
+        };
+
+        renderTab(currentTab);
+      } catch (err) {
+        console.error("FeedMe Render Error:", err);
+        document.getElementById('app').innerHTML = `
+          <div class="loading" style="padding: 20px; font-size: 0.95rem;">
+            ⚠️ <strong>Error parsing feed data</strong><br><br>
+            <span style="font-size: 0.8rem; color: #ef4444;">${err.message || err}</span><br><br>
+            <button onclick="fetchFeedData()" class="btn" style="font-size:0.85rem;">Retry</button>
+          </div>
+        `;
+      }
     }
-
-    let rawData = await response.json();
-
-    // If Google Apps Script returned a double-stringified JSON string, parse it again
-    if (typeof rawData === 'string') {
-      rawData = JSON.parse(rawData);
-    }
-
-    // Ensure the required tabs exist before rendering
-    feedData = {
-      inform: rawData.inform || [],
-      learn: rawData.learn || [],
-      life: rawData.life || []
-    };
-
-    renderTab(currentTab);
-  } catch (err) {
-    console.error("FeedMe Detailed Error:", err);
-    document.getElementById('app').innerHTML = `
-      <div class="loading" style="padding: 20px; font-size: 0.95rem;">
-        ⚠️ <strong>Error loading feed</strong><br><br>
-        <span style="font-size: 0.8rem; color: #ef4444;">${err.stack || err.message || err}</span><br><br>
-        <button onclick="fetchFeedData()" class="btn" style="font-size:0.85rem;">Retry</button>
-      </div>
-    `;
-  }
-}
-
 
     function switchTab(tabName) {
       currentTab = tabName;
       document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
-      document.getElementById(`tab-${tabName}`).classList.add('active');
+      const activeBtn = document.getElementById(`tab-${tabName}`);
+      if (activeBtn) activeBtn.classList.add('active');
       renderTab(tabName);
     }
 
@@ -213,22 +62,33 @@ async function fetchFeedData() {
       const total = posts.length;
 
       if (total === 0) {
-        document.getElementById('app').innerHTML = `<div class="loading">No cards available in ${tabName.toUpperCase()} today.</div>`;
+        document.getElementById('app').innerHTML = `
+          <div class="loading" style="padding:20px;">
+            No cards available in <strong>${tabName.toUpperCase()}</strong> tab today.
+          </div>`;
         return;
       }
 
       let slidesHtml = '';
       posts.forEach((post, index) => {
+        const title = post.title || 'Untitled Card';
+        const content = post.content || '';
+        const category = post.category || tabName.toUpperCase();
+        const sourceName = post.source_name || '';
+        const sourceUrl = post.source_url || '';
+
         slidesHtml += `
           <div class="swiper-slide">
             <div class="card">
               <div>
-                <div class="category">${index + 1}/${total} • ${post.category || tabName.toUpperCase()}</div>
-                <h2 class="title">${post.title}</h2>
-                <div class="content">${post.content}</div>
+                <div class="category">${index + 1}/${total} • ${category}</div>
+                <h2 class="title">${title}</h2>
+                <div class="content">${content}</div>
               </div>
               <div class="footer">
-                ${post.source_url ? `<a href="${post.source_url}" target="_blank" class="source-link">🔗 ${post.source_name || 'Read Source'}</a>` : `<span class="source-link">${post.source_name || ''}</span>`}
+                ${sourceUrl 
+                  ? `<a href="${sourceUrl}" target="_blank" rel="noopener" class="source-link">🔗 ${sourceName || 'Read Source'}</a>` 
+                  : `<span class="source-link">${sourceName}</span>`}
                 <div class="actions">
                   <button class="btn" onclick="rate('up')">👍</button>
                   <button class="btn" onclick="rate('down')">👎</button>
@@ -257,14 +117,15 @@ async function fetchFeedData() {
       setupLongPress();
     }
 
-    // Long press (500ms) anywhere on screen switches to next tab
     function setupLongPress() {
       const appEl = document.getElementById('app');
+      if (!appEl) return;
+
       appEl.addEventListener('touchstart', () => {
         longPressTimer = setTimeout(() => {
           nextTab();
         }, 500);
-      });
+      }, { passive: true });
 
       appEl.addEventListener('touchend', () => {
         clearTimeout(longPressTimer);
@@ -277,5 +138,3 @@ async function fetchFeedData() {
 
     fetchFeedData();
   </script>
-</body>
-</html>
