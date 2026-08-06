@@ -1,6 +1,241 @@
-<script src="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.js"></script>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>FeedMe</title>
+  
+  <!-- Swiper.js CSS -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.css" />
+  
+  <style>
+    :root {
+      --bg: #0f172a;
+      --card-bg: #1e293b;
+      --text: #f8fafc;
+      --text-muted: #94a3b8;
+      --accent: #38bdf8;
+      --accent-hover: #0284c7;
+      --border: #334155;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+      background-color: var(--bg);
+      color: var(--text);
+      height: 100vh;
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+    }
+
+    /* Top Navigation Header */
+    header {
+      padding: 12px 16px;
+      background-color: var(--bg);
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      z-index: 10;
+    }
+
+    .brand {
+      font-size: 1.25rem;
+      font-weight: 800;
+      letter-spacing: -0.025em;
+      color: var(--accent);
+    }
+
+    .tabs {
+      display: flex;
+      gap: 6px;
+      background-color: var(--card-bg);
+      padding: 4px;
+      border-radius: 8px;
+    }
+
+    .tab-btn {
+      background: none;
+      border: none;
+      color: var(--text-muted);
+      padding: 6px 12px;
+      font-size: 0.75rem;
+      font-weight: 600;
+      border-radius: 6px;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+
+    .tab-btn.active {
+      background-color: var(--accent);
+      color: #000;
+    }
+
+    /* Main Container */
+    #app {
+      flex: 1;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .loading {
+      height: 100%;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      color: var(--text-muted);
+      padding: 24px;
+      font-size: 0.95rem;
+    }
+
+    /* Swiper & Card Styles */
+    .swiper {
+      width: 100%;
+      height: 100%;
+    }
+
+    .swiper-slide {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      padding: 16px;
+    }
+
+    .card {
+      background-color: var(--card-bg);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      width: 100%;
+      max-width: 500px;
+      height: 100%;
+      max-height: 680px;
+      padding: 20px;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.3);
+    }
+
+    .card-body {
+      overflow-y: auto;
+      padding-right: 4px;
+      flex: 1;
+      margin-bottom: 16px;
+    }
+
+    /* Scrollbar Styling inside Card */
+    .card-body::-webkit-scrollbar {
+      width: 4px;
+    }
+    .card-body::-webkit-scrollbar-thumb {
+      background: var(--border);
+      border-radius: 4px;
+    }
+
+    .category {
+      font-size: 0.7rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: var(--accent);
+      margin-bottom: 8px;
+    }
+
+    .title {
+      font-size: 1.2rem;
+      font-weight: 700;
+      line-height: 1.35;
+      margin-bottom: 12px;
+      color: var(--text);
+    }
+
+    .content {
+      font-size: 0.92rem;
+      line-height: 1.6;
+      color: #cbd5e1;
+      white-space: pre-line;
+    }
+
+    .footer {
+      border-top: 1px solid var(--border);
+      padding-top: 12px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .source-link {
+      font-size: 0.8rem;
+      color: var(--accent);
+      text-decoration: none;
+      font-weight: 500;
+      max-width: 65%;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .source-link:hover {
+      text-decoration: underline;
+    }
+
+    .actions {
+      display: flex;
+      gap: 8px;
+    }
+
+    .btn {
+      background-color: var(--bg);
+      border: 1px solid var(--border);
+      color: var(--text);
+      padding: 8px 12px;
+      border-radius: 8px;
+      cursor: pointer;
+      font-size: 0.9rem;
+      transition: background 0.15s ease;
+    }
+
+    .btn:active {
+      transform: scale(0.95);
+      background-color: var(--border);
+    }
+  </style>
+</head>
+<body>
+
+  <header>
+    <div class="brand">FeedMe</div>
+    <div class="tabs">
+      <button id="tab-inform" class="tab-btn active" onclick="switchTab('inform')">Inform</button>
+      <button id="tab-learn" class="tab-btn" onclick="switchTab('learn')">Learn</button>
+      <button id="tab-life" class="tab-btn" onclick="switchTab('life')">Life</button>
+    </div>
+  </header>
+
+  <main id="app">
+    <div class="loading">
+      <span>Fetching your daily feed...</span>
+    </div>
+  </main>
+
+  <!-- Swiper.js Library -->
+  <script src="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.js"></script>
+  
   <script>
-    const FEED_API_URL = "https://script.google.com/macros/s/AKfycbwjlWMzricTk_dQEthEhUiOXYOq3one9kmSb0NHe0U1IxgRdoYxNFdEkoMicIMQocdC/exec"; // <-- Ensure your Web App URL is here
+    // Replace with your active Google Apps Script Web App URL
+    const FEED_API_URL = "https://script.google.com/macros/s/AKfycbwjlWMzricTk_dQEthEhUiOXYOq3one9kmSb0NHe0U1IxgRdoYxNFdEkoMicIMQocdC/exec"; 
     
     let feedData = { inform: [], learn: [], life: [] };
     let currentTab = 'inform';
@@ -15,11 +250,11 @@
           throw new Error(`HTTP Error: ${response.status}`);
         }
 
-        // Use .text() first to prevent response.json() syntax crashes
+        // Fetch as raw text to avoid direct stream parsing errors
         const textData = await response.text();
         let parsed = JSON.parse(textData);
 
-        // Handle double-stringified JSON if returned by Apps Script
+        // Handle double-stringified JSON output from Apps Script
         if (typeof parsed === 'string') {
           parsed = JSON.parse(parsed);
         }
@@ -34,10 +269,10 @@
       } catch (err) {
         console.error("FeedMe Render Error:", err);
         document.getElementById('app').innerHTML = `
-          <div class="loading" style="padding: 20px; font-size: 0.95rem;">
-            ⚠️ <strong>Error parsing feed data</strong><br><br>
+          <div class="loading" style="padding: 20px;">
+            <p>⚠️ <strong>Error loading feed data</strong></p><br>
             <span style="font-size: 0.8rem; color: #ef4444;">${err.message || err}</span><br><br>
-            <button onclick="fetchFeedData()" class="btn" style="font-size:0.85rem;">Retry</button>
+            <button onclick="fetchFeedData()" class="btn">Retry</button>
           </div>
         `;
       }
@@ -63,7 +298,7 @@
 
       if (total === 0) {
         document.getElementById('app').innerHTML = `
-          <div class="loading" style="padding:20px;">
+          <div class="loading">
             No cards available in <strong>${tabName.toUpperCase()}</strong> tab today.
           </div>`;
         return;
@@ -80,7 +315,7 @@
         slidesHtml += `
           <div class="swiper-slide">
             <div class="card">
-              <div>
+              <div class="card-body">
                 <div class="category">${index + 1}/${total} • ${category}</div>
                 <h2 class="title">${title}</h2>
                 <div class="content">${content}</div>
@@ -133,8 +368,11 @@
     }
 
     function rate(type) {
-      alert(type === 'up' ? 'Liked card!' : 'Disliked card!');
+      alert(type === 'up' ? 'Saved feedback: Liked' : 'Saved feedback: Disliked');
     }
 
+    // Initialize Feed Fetch on page load
     fetchFeedData();
   </script>
+</body>
+</html>
