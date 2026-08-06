@@ -158,33 +158,42 @@
     let swiperInstance = null;
     let longPressTimer = null;
 
-
-    async function fetchFeedData() {
+async function fetchFeedData() {
   try {
-    // Force browser to bypass cache and explicitly follow Google's redirect
     const cacheBuster = `?t=${new Date().getTime()}`;
-    const response = await fetch(FEED_API_URL + cacheBuster, {
-      method: 'GET',
-      redirect: 'follow'
-    });
+    const response = await fetch(FEED_API_URL + cacheBuster);
 
     if (!response.ok) {
-      throw new Error(`HTTP error! status: ${response.status}`);
+      throw new Error(`HTTP Status ${response.status}`);
     }
 
-    feedData = await response.json();
+    let rawData = await response.json();
+
+    // If Google Apps Script returned a double-stringified JSON string, parse it again
+    if (typeof rawData === 'string') {
+      rawData = JSON.parse(rawData);
+    }
+
+    // Ensure the required tabs exist before rendering
+    feedData = {
+      inform: rawData.inform || [],
+      learn: rawData.learn || [],
+      life: rawData.life || []
+    };
+
     renderTab(currentTab);
   } catch (err) {
-    console.error("FeedMe Fetch Error:", err);
+    console.error("FeedMe Detailed Error:", err);
     document.getElementById('app').innerHTML = `
       <div class="loading" style="padding: 20px; font-size: 0.95rem;">
         ⚠️ <strong>Error loading feed</strong><br><br>
-        <span style="font-size: 0.8rem; color: #ef4444;">${err.message || err}</span><br><br>
+        <span style="font-size: 0.8rem; color: #ef4444;">${err.stack || err.message || err}</span><br><br>
         <button onclick="fetchFeedData()" class="btn" style="font-size:0.85rem;">Retry</button>
       </div>
     `;
   }
 }
+
 
     function switchTab(tabName) {
       currentTab = tabName;
