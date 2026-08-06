@@ -158,15 +158,33 @@
     let swiperInstance = null;
     let longPressTimer = null;
 
+
     async function fetchFeedData() {
-      try {
-        const response = await fetch(FEED_API_URL);
-        feedData = await response.json();
-        renderTab(currentTab);
-      } catch (err) {
-        document.getElementById('app').innerHTML = '<div class="loading">Error loading feed. Check URL.</div>';
-      }
+  try {
+    // Force browser to bypass cache and explicitly follow Google's redirect
+    const cacheBuster = `?t=${new Date().getTime()}`;
+    const response = await fetch(FEED_API_URL + cacheBuster, {
+      method: 'GET',
+      redirect: 'follow'
+    });
+
+    if (!response.ok) {
+      throw new Error(`HTTP error! status: ${response.status}`);
     }
+
+    feedData = await response.json();
+    renderTab(currentTab);
+  } catch (err) {
+    console.error("FeedMe Fetch Error:", err);
+    document.getElementById('app').innerHTML = `
+      <div class="loading" style="padding: 20px; font-size: 0.95rem;">
+        ⚠️ <strong>Error loading feed</strong><br><br>
+        <span style="font-size: 0.8rem; color: #ef4444;">${err.message || err}</span><br><br>
+        <button onclick="fetchFeedData()" class="btn" style="font-size:0.85rem;">Retry</button>
+      </div>
+    `;
+  }
+}
 
     function switchTab(tabName) {
       currentTab = tabName;
