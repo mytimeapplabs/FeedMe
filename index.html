@@ -1,4 +1,4 @@
-<!DOCTYPE html> 
+<!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8">
@@ -15,7 +15,6 @@
       --text: #f8fafc;
       --text-muted: #94a3b8;
       --accent: #38bdf8;
-      --accent-hover: #0284c7;
       --border: #334155;
     }
 
@@ -36,7 +35,7 @@
       overflow: hidden;
     }
 
-    /* Top Navigation Header */
+    /* Header Navigation */
     header {
       padding: 12px 16px;
       background-color: var(--bg);
@@ -50,7 +49,6 @@
     .brand {
       font-size: 1.25rem;
       font-weight: 800;
-      letter-spacing: -0.025em;
       color: var(--accent);
     }
 
@@ -73,7 +71,6 @@
       cursor: pointer;
       transition: all 0.2s ease;
       text-transform: uppercase;
-      letter-spacing: 0.05em;
     }
 
     .tab-btn.active {
@@ -81,7 +78,7 @@
       color: #000;
     }
 
-    /* Main Container */
+    /* App Container */
     #app {
       flex: 1;
       position: relative;
@@ -97,7 +94,6 @@
       text-align: center;
       color: var(--text-muted);
       padding: 24px;
-      font-size: 0.95rem;
     }
 
     /* Swiper & Card Styles */
@@ -110,7 +106,7 @@
       display: flex;
       justify-content: center;
       align-items: center;
-      padding: 16px;
+      padding: 12px;
     }
 
     .card {
@@ -118,24 +114,24 @@
       border: 1px solid var(--border);
       border-radius: 16px;
       width: 100%;
-      max-width: 500px;
+      max-width: 520px;
       height: 100%;
-      max-height: 680px;
+      max-height: 720px;
       padding: 20px;
       display: flex;
       flex-direction: column;
       justify-content: space-between;
-      box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.3);
+      box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.4);
     }
 
     .card-body {
       overflow-y: auto;
-      padding-right: 4px;
+      padding-right: 6px;
       flex: 1;
-      margin-bottom: 16px;
+      margin-bottom: 12px;
+      -webkit-overflow-scrolling: touch;
     }
 
-    /* Scrollbar Styling inside Card */
     .card-body::-webkit-scrollbar {
       width: 4px;
     }
@@ -154,20 +150,46 @@
     }
 
     .title {
-      font-size: 1.2rem;
+      font-size: 1.25rem;
       font-weight: 700;
       line-height: 1.35;
-      margin-bottom: 12px;
+      margin-bottom: 14px;
       color: var(--text);
     }
 
+    /* Content & Markdown Formatting */
     .content {
-      font-size: 0.92rem;
-      line-height: 1.6;
+      font-size: 0.95rem;
+      line-height: 1.65;
       color: #cbd5e1;
-      white-space: pre-line;
     }
 
+    .content h1, .content h2, .content h3 {
+      color: var(--text);
+      margin: 16px 0 8px 0;
+      font-weight: 700;
+    }
+    .content h1 { font-size: 1.15rem; border-bottom: 1px solid var(--border); padding-bottom: 4px; }
+    .content h2 { font-size: 1.05rem; }
+    .content h3 { font-size: 0.95rem; color: var(--accent); }
+
+    .content p {
+      margin-bottom: 12px;
+    }
+
+    .content ul, .content ol {
+      margin: 8px 0 12px 20px;
+    }
+
+    .content li {
+      margin-bottom: 4px;
+    }
+
+    .content strong {
+      color: #f1f5f9;
+    }
+
+    /* Card Footer */
     .footer {
       border-top: 1px solid var(--border);
       padding-top: 12px;
@@ -187,10 +209,6 @@
       text-overflow: ellipsis;
     }
 
-    .source-link:hover {
-      text-decoration: underline;
-    }
-
     .actions {
       display: flex;
       gap: 8px;
@@ -204,12 +222,6 @@
       border-radius: 8px;
       cursor: pointer;
       font-size: 0.9rem;
-      transition: background 0.15s ease;
-    }
-
-    .btn:active {
-      transform: scale(0.95);
-      background-color: var(--border);
     }
   </style>
 </head>
@@ -230,34 +242,24 @@
     </div>
   </main>
 
-  <!-- Swiper.js Library -->
   <script src="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.js"></script>
   
   <script>
-    // Replace with your active Google Apps Script Web App URL
-    const FEED_API_URL = "https://script.google.com/macros/s/AKfycbwjlWMzricTk_dQEthEhUiOXYOq3one9kmSb0NHe0U1IxgRdoYxNFdEkoMicIMQocdC/exec"; 
+    const FEED_API_URL = "https://script.google.com/macros/s/AKfycbwjlWMzricTk_dQEthEhUiOXYOq3one9kmSb0NHe0U1IxgRdoYxNFdEkoMicIMQocdC/exec"; // <-- Ensure your Web App URL is here
     
     let feedData = { inform: [], learn: [], life: [] };
     let currentTab = 'inform';
     let swiperInstance = null;
-    let longPressTimer = null;
 
     async function fetchFeedData() {
       try {
         const response = await fetch(FEED_API_URL);
-        
-        if (!response.ok) {
-          throw new Error(`HTTP Error: ${response.status}`);
-        }
+        if (!response.ok) throw new Error(`HTTP Error: ${response.status}`);
 
-        // Fetch as raw text to avoid direct stream parsing errors
         const textData = await response.text();
         let parsed = JSON.parse(textData);
 
-        // Handle double-stringified JSON output from Apps Script
-        if (typeof parsed === 'string') {
-          parsed = JSON.parse(parsed);
-        }
+        if (typeof parsed === 'string') parsed = JSON.parse(parsed);
 
         feedData = {
           inform: Array.isArray(parsed.inform) ? parsed.inform : [],
@@ -286,10 +288,28 @@
       renderTab(tabName);
     }
 
-    function nextTab() {
-      const tabs = ['inform', 'learn', 'life'];
-      const nextIdx = (tabs.indexOf(currentTab) + 1) % tabs.length;
-      switchTab(tabs[nextIdx]);
+    function parseMarkdown(str) {
+      if (!str) return '';
+      let html = str;
+
+      // Convert Headings
+      html = html.replace(/^# (.*$)/gim, '<h1>$1</h1>');
+      html = html.replace(/^## (.*$)/gim, '<h2>$1</h2>');
+      html = html.replace(/^### (.*$)/gim, '<h3>$1</h3>');
+
+      // Convert Bold & Italics
+      html = html.replace(/\*\*(.*?)\*\*/gim, '<strong>$1</strong>');
+      html = html.replace(/\*(.*?)\*/gim, '<em>$1</em>');
+
+      // Convert Bullet points
+      html = html.replace(/^\• (.*$)/gim, '<li>$1</li>');
+      html = html.replace(/^ - (.*$)/gim, '<li>$1</li>');
+
+      // Convert Line breaks & Paragraphs
+      html = html.replace(/\n\n/g, '</p><p>');
+      html = html.replace(/\n/g, '<br>');
+
+      return `<p>${html}</p>`;
     }
 
     function renderTab(tabName) {
@@ -307,7 +327,7 @@
       let slidesHtml = '';
       posts.forEach((post, index) => {
         const title = post.title || 'Untitled Card';
-        const content = post.content || '';
+        const formattedContent = parseMarkdown(post.content || '');
         const category = post.category || tabName.toUpperCase();
         const sourceName = post.source_name || '';
         const sourceUrl = post.source_url || '';
@@ -318,7 +338,7 @@
               <div class="card-body">
                 <div class="category">${index + 1}/${total} • ${category}</div>
                 <h2 class="title">${title}</h2>
-                <div class="content">${content}</div>
+                <div class="content">${formattedContent}</div>
               </div>
               <div class="footer">
                 ${sourceUrl 
@@ -342,28 +362,14 @@
         </div>
       `;
 
-      if (swiperInstance) swiperInstance.destroy();
+      if (swiperInstance) swiperInstance.destroy(true, true);
       swiperInstance = new Swiper('.swiper', {
         direction: 'horizontal',
         loop: false,
-        spaceBetween: 12
-      });
-
-      setupLongPress();
-    }
-
-    function setupLongPress() {
-      const appEl = document.getElementById('app');
-      if (!appEl) return;
-
-      appEl.addEventListener('touchstart', () => {
-        longPressTimer = setTimeout(() => {
-          nextTab();
-        }, 500);
-      }, { passive: true });
-
-      appEl.addEventListener('touchend', () => {
-        clearTimeout(longPressTimer);
+        spaceBetween: 12,
+        observer: true,
+        observeParents: true,
+        nested: true
       });
     }
 
@@ -371,7 +377,6 @@
       alert(type === 'up' ? 'Saved feedback: Liked' : 'Saved feedback: Disliked');
     }
 
-    // Initialize Feed Fetch on page load
     fetchFeedData();
   </script>
 </body>
