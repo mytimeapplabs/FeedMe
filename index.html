@@ -2,330 +2,207 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-  <title>FeedMe</title>
-  
-  <!-- PWA Manifest & App Icons (Lightning Bolt ⚡) -->
-  <link rel="manifest" href="data:application/manifest+json;base64,ewogICJuYW1lIjogIkZlZWRNZSIsCiAgInNob3J0X25hbWUiOiAiRmVlZE1lIiwKICAic3RhcnRfdXJsIjogIi4iLAogICJkaXNwbGF5IjogInN0YW5kYWxvbmUiLAogICJiYWNrZ3JvdW5kX2NvbG9yIjogIiMxMmExYTIiLAogICJ0aGVtZV9jb2xvciI6ICIxMmExYTIiCiB9">
-  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' rx='20' fill='%2312a1a2'/><text x='50%' y='68%' font-size='55' text-anchor='middle' fill='white'>⚡</text></svg>">
-  <link rel="apple-touch-icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' rx='20' fill='%2312a1a2'/><text x='50%' y='68%' font-size='55' text-anchor='middle' fill='white'>⚡</text></svg>">
-
-  <!-- Swiper.js CSS -->
-  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.css" />
-
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Content Aggregator</title>
   <style>
     :root {
-      --bg-color: #0f172a;
-      --card-bg: #1e293b;
-      --text-main: #f8fafc;
-      --text-sub: #94a3b8;
-      --accent: #12a1a2;
-      --border-color: #334155;
-      --read-color: #22c55e;
+      --bg-color: #f4f6f8;
+      --card-bg: #ffffff;
+      --text-primary: #1a1a1a;
+      --text-secondary: #4a5568;
+      --accent-color: #2563eb;
+      --border-color: #e2e8f0;
     }
 
-    * { box-sizing: border-box; margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; }
-    body { background-color: var(--bg-color); color: var(--text-main); display: flex; flex-direction: column; height: 100vh; height: 100dvh; overflow: hidden; }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+      background-color: var(--bg-color);
+      color: var(--text-primary);
+      margin: 0;
+      padding: 20px;
+    }
 
-    header {
+    .container {
+      max-width: 900px;
+      margin: 0 auto;
+    }
+
+    /* Tab Navigation */
+    .tabs {
       display: flex;
-      justify-content: space-between;
-      align-items: center;
-      padding: 10px 14px;
-      background-color: #090d16;
-      border-bottom: 1px solid var(--border-color);
-      flex-shrink: 0;
+      gap: 10px;
+      margin-bottom: 20px;
+      border-bottom: 2px solid var(--border-color);
+      padding-bottom: 10px;
     }
 
-    .brand { font-weight: 700; font-size: 1.1rem; color: var(--accent); display: flex; align-items: center; gap: 4px; }
-    
-    .tab-bar { display: flex; gap: 6px; }
-    
-    /* Reduced tab icons size by ~15% */
     .tab-btn {
-      background: var(--card-bg);
-      border: 1px solid var(--border-color);
-      font-size: 1.1rem;
-      padding: 5px 12px;
-      border-radius: 20px;
+      padding: 8px 18px;
+      border: none;
+      background: #cbd5e1;
+      color: var(--text-primary);
+      border-radius: 6px;
       cursor: pointer;
-      transition: all 0.2s ease;
+      font-weight: 600;
+      font-size: 0.95rem;
+      transition: background 0.2s, color 0.2s;
     }
-    .tab-btn.active { background: var(--accent); border-color: var(--accent); }
 
-    .history-controls { display: flex; align-items: center; min-width: 40px; justify-content: flex-end; }
-    
-    .nav-btn {
-      background: var(--card-bg);
-      border: 1px solid var(--border-color);
-      color: var(--text-main);
-      padding: 5px 12px;
-      border-radius: 8px;
-      font-size: 0.85rem;
-      cursor: pointer;
-      font-weight: 700;
-      transition: background 0.2s;
+    .tab-btn.active {
+      background: var(--accent-color);
+      color: #ffffff;
     }
-    .nav-btn:active { background: var(--accent); }
 
-    main { flex: 1; display: flex; flex-direction: column; padding: 10px 12px 14px 12px; overflow: hidden; min-height: 0; }
-    
-    .date-indicator { text-align: center; font-size: 0.8rem; color: var(--text-sub); margin-bottom: 8px; flex-shrink: 0; }
+    /* Cards Layout */
+    .cards-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+      gap: 16px;
+    }
 
-    /* Swiper Container & Layout Fixes */
-    .swiper { width: 100%; height: 100%; max-width: 480px; margin: 0 auto; }
-    
-    .swiper-slide {
+    .card {
       background: var(--card-bg);
+      border-radius: 10px;
+      padding: 18px;
+      box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);
       border: 1px solid var(--border-color);
-      border-radius: 16px;
-      padding: 16px;
       display: flex;
       flex-direction: column;
-      box-shadow: 0 10px 25px rgba(0,0,0,0.5);
-      height: 100%;
-      box-sizing: border-box;
     }
 
-    .card-header { flex-shrink: 0; margin-bottom: 10px; }
-    .card-title { font-size: 1.1rem; font-weight: 700; color: var(--text-main); line-height: 1.35; margin-bottom: 4px; }
-    .card-source { font-size: 0.8rem; color: var(--accent); font-weight: 600; }
-    
-    /* Scrollable body content so footer remains grounded */
-    .card-body { 
-      font-size: 0.9rem; 
-      color: var(--text-sub); 
-      line-height: 1.5; 
-      white-space: pre-line; 
-      flex: 1; 
-      overflow-y: auto; 
-      padding-right: 4px;
-      margin-bottom: 8px;
+    .card-title {
+      margin: 0 0 10px 0;
+      font-size: 1.15rem;
+      font-weight: 700;
+      color: var(--text-primary);
+      line-height: 1.3;
     }
 
-    /* Fixed Card Footer & Visible Checkmark */
-    .card-footer {
-      display: flex;
-      justify-content: flex-end;
-      align-items: center;
-      padding-top: 10px;
-      border-top: 1px solid rgba(255, 255, 255, 0.08);
-      flex-shrink: 0;
+    /* Important: Keeps line breaks intact and ensures text is visible */
+    .card-body {
+      margin: 0;
+      font-size: 0.95rem;
+      color: var(--text-secondary);
+      line-height: 1.5;
+      white-space: pre-wrap;
+      word-break: break-word;
+      display: block !important;
+      visibility: visible !important;
     }
 
-    .check-btn {
-      background: transparent;
-      border: 1px solid var(--border-color);
-      color: var(--text-sub);
-      border-radius: 50%;
-      width: 44px;
-      height: 44px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 1.2rem;
-      cursor: pointer;
-      transition: all 0.2s ease;
-      flex-shrink: 0;
+    .loading, .empty-state {
+      text-align: center;
+      padding: 40px;
+      color: var(--text-secondary);
+      grid-column: 1 / -1;
     }
-
-    .check-btn.read {
-      background: rgba(34, 197, 94, 0.2);
-      border-color: var(--read-color);
-      color: var(--read-color);
-    }
-
-    .empty-state { text-align: center; color: var(--text-sub); margin-top: 60px; font-size: 0.95rem; }
   </style>
 </head>
 <body>
 
-  <header>
-    <div class="brand">⚡ FeedMe</div>
-    <div class="tab-bar">
-      <button class="tab-btn active" onclick="switchTab('news')" title="News">📰</button>
-      <button class="tab-btn" onclick="switchTab('learn')" title="Learn">💡</button>
-      <button class="tab-btn" onclick="switchTab('life')" title="Life">🌱</button>
-    </div>
-    <div class="history-controls">
-      <!-- Dynamic single toggle button (-1 or +1) -->
-      <button class="nav-btn" id="date-toggle-btn" onclick="togglePriorDay()">-1</button>
-    </div>
-  </header>
+  <div class="container">
+    <!-- Navigation Tabs -->
+    <nav class="tabs" id="tab-nav">
+      <button class="tab-btn active" data-tab="Learn">Learn</button>
+      <button class="tab-btn" data-tab="Life">Life</button>
+    </nav>
 
-  <main>
-    <div class="date-indicator" id="date-label">Loading feed...</div>
-    
-    <div class="swiper" id="swiper-container">
-      <div class="swiper-wrapper" id="swiper-wrapper"></div>
+    <!-- Cards Container -->
+    <div id="cards-container" class="cards-grid">
+      <div class="loading">Loading cards...</div>
     </div>
-  </main>
-
-  <!-- Swiper.js Script -->
-  <script src="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.js"></script>
+  </div>
 
   <script>
-    // Enter your Web App Deployment URL here if running standalone/GitHub Pages
+    // Paste your Google Apps Script Web App Deployment URL here
     const WEB_APP_URL = "https://script.google.com/macros/s/AKfycbwjlWMzricTk_dQEthEhUiOXYOq3one9kmSb0NHe0U1IxgRdoYxNFdEkoMicIMQocdC/exec";
 
-    let currentFeedData = { news: [], learn: [], life: [] };
-    let currentTab = 'news';
-    let currentDateOffset = 0; // Strictly 0 (Today) or -1 (Yesterday)
-    let readCardIds = new Set();
-    let swiperInstance = null;
+    let dataset = {};
+    let activeTab = "Learn";
 
-    document.addEventListener("DOMContentLoaded", () => {
-      loadFeedForOffset(0);
-    });
+    const cardsContainer = document.getElementById('cards-container');
+    const tabNav = document.getElementById('tab-nav');
 
-    function switchTab(tabName) {
-      currentTab = tabName;
-      document.querySelectorAll('.tab-btn').forEach((btn, idx) => {
-        btn.classList.toggle('active', ['news', 'learn', 'life'][idx] === tabName);
-      });
-      renderCardsDeck();
-    }
+    // Safe DOM construction preventing HTML syntax issues on newlines/quotes
+    function createCardElement(item) {
+      const card = document.createElement('div');
+      card.className = 'card';
 
-    function togglePriorDay() {
-      // Toggle offset strictly between 0 and -1
-      currentDateOffset = (currentDateOffset === 0) ? -1 : 0;
+      // Title Key Fallbacks
+      const title = document.createElement('h3');
+      title.className = 'card-title';
+      title.textContent = item.title || item.name || item.topic || 'Untitled';
+
+      // Body Content Key Fallbacks (Covers common sheet header names)
+      const body = document.createElement('p');
+      body.className = 'card-body';
       
-      const toggleBtn = document.getElementById('date-toggle-btn');
-      if (currentDateOffset === 0) {
-        toggleBtn.innerText = "-1";
-        toggleBtn.title = "Go to Yesterday's Feed";
-      } else {
-        toggleBtn.innerText = "+1";
-        toggleBtn.title = "Return to Today's Feed";
-      }
-      
-      loadFeedForOffset(currentDateOffset);
+      const bodyContent = item.content 
+        || item.description 
+        || item.body 
+        || item.text 
+        || item.summary 
+        || item.notes 
+        || item.details 
+        || '';
+
+      body.textContent = bodyContent ? bodyContent : 'No content available.';
+
+      card.appendChild(title);
+      card.appendChild(body);
+      return card;
     }
 
-    function getDateStrForOffset(offset) {
-      let d = new Date();
-      d.setDate(d.getDate() + offset);
-      return d.toISOString().split('T')[0];
-    }
+    // Render cards based on active tab
+    function renderTab(tabName) {
+      cardsContainer.innerHTML = '';
 
-    function loadFeedForOffset(offset) {
-      const dateStr = offset === 0 ? '' : getDateStrForOffset(offset);
-      document.getElementById('date-label').innerText = `Loading (${offset === 0 ? 'Today' : 'Yesterday'})...`;
+      // Match tab name case-insensitively
+      const matchingKey = Object.keys(dataset).find(
+        key => key.trim().toLowerCase() === tabName.trim().toLowerCase()
+      );
 
-      if (typeof google !== 'undefined' && google.script && google.script.run) {
-        google.script.run
-          .withSuccessHandler(onDataLoaded)
-          .getFeedDataForDate(dateStr);
-      } else {
-        const targetUrl = `${WEB_APP_URL}?action=fetchData${dateStr ? '&date=' + dateStr : ''}`;
-        fetch(targetUrl)
-          .then(res => res.json())
-          .then(data => onDataLoaded(data))
-          .catch(err => console.error("Fetch error:", err));
-      }
-    }
+      const items = matchingKey ? dataset[matchingKey] : (Array.isArray(dataset) ? dataset : []);
 
-    function onDataLoaded(data) {
-      currentFeedData = data || { news: [], learn: [], life: [] };
-      const displayDate = data && data.date ? data.date : getDateStrForOffset(currentDateOffset);
-      const labelPrefix = currentDateOffset === 0 ? 'Today' : 'Yesterday';
-      document.getElementById('date-label').innerText = `${labelPrefix} (${displayDate})`;
-      renderCardsDeck();
-    }
-
-    function renderCardsDeck() {
-      const wrapper = document.getElementById('swiper-wrapper');
-      wrapper.innerHTML = '';
-
-      if (swiperInstance) {
-        swiperInstance.destroy(true, true);
-        swiperInstance = null;
-      }
-
-      const cards = currentFeedData[currentTab] || [];
-
-      if (cards.length === 0) {
-        wrapper.innerHTML = `<div class="empty-state">No items in this category for ${currentDateOffset === 0 ? 'today' : 'yesterday'}.</div>`;
+      if (!items || items.length === 0) {
+        cardsContainer.innerHTML = `<div class="empty-state">No items found under ${tabName}.</div>`;
         return;
       }
 
-      cards.forEach((card, index) => {
-        const cardId = `${currentTab}_${index}`;
-        const isRead = readCardIds.has(cardId);
-
-        const slide = document.createElement('div');
-        slide.className = 'swiper-slide';
-        slide.innerHTML = `
-          <div class="card-header">
-            <div class="card-title">${escapeHtml(card.title)}</div>
-            <div class="card-source">${escapeHtml(card.source || 'Direct Feed')}</div>
-          </div>
-          <div class="card-body">${escapeHtml(card.body || card.snippet || '')}</div>
-          <div class="card-footer">
-            <button class="check-btn ${isRead ? 'read' : ''}" onclick="toggleRead('${cardId}', this)" title="Mark as Read">
-              ✓
-            </button>
-          </div>
-        `;
-        wrapper.appendChild(slide);
-      });
-
-      // Swiper card stack initialization
-      swiperInstance = new Swiper('.swiper', {
-        effect: 'cards',
-        grabCursor: true,
-        cardsEffect: {
-          perSlideOffset: 8,
-          perSlideRotate: 2,
-          rotate: true,
-          slideShadows: false
-        },
-        on: {
-          slideChange: function () {
-            const prevIndex = this.previousIndex;
-            if (prevIndex !== undefined) {
-              const prevCardId = `${currentTab}_${prevIndex}`;
-              readCardIds.add(prevCardId);
-              calculateAndSyncProgress();
-            }
-          }
-        }
+      items.forEach(item => {
+        cardsContainer.appendChild(createCardElement(item));
       });
     }
 
-    function toggleRead(cardId, btnEl) {
-      if (readCardIds.has(cardId)) {
-        readCardIds.delete(cardId);
-        btnEl.classList.remove('read');
-      } else {
-        readCardIds.add(cardId);
-        btnEl.classList.add('read');
-      }
-      calculateAndSyncProgress();
-    }
-
-    function calculateAndSyncProgress() {
-      const totalCards = (currentFeedData.news?.length || 0) + 
-                         (currentFeedData.learn?.length || 0) + 
-                         (currentFeedData.life?.length || 0);
-      if (totalCards === 0) return;
-
-      const readCount = readCardIds.size;
-      const score = Math.min(100, Math.round((readCount / totalCards) * 100));
-
-      if (currentDateOffset === 0) {
-        const todayStr = getDateStrForOffset(0);
-        if (typeof google !== 'undefined' && google.script && google.script.run) {
-          google.script.run.saveDailyMetric(todayStr, score);
-        } else {
-          fetch(`${WEB_APP_URL}?action=saveMetrics&day=${todayStr}&score=${score}`);
-        }
+    // Fetch payload from Apps Script
+    async function fetchData() {
+      try {
+        const response = await fetch(WEB_APP_URL);
+        const data = await response.json();
+        
+        console.log("Raw API Response:", data); // Inspect structure in browser console
+        
+        dataset = data;
+        renderTab(activeTab);
+      } catch (error) {
+        console.error("Fetch Error:", error);
+        cardsContainer.innerHTML = `<div class="empty-state">Error loading content. Please check Web App URL permissions.</div>`;
       }
     }
 
-    function escapeHtml(str) {
-      return (str || '').replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
-    }
+    // Tab switching event listener
+    tabNav.addEventListener('click', (e) => {
+      if (e.target.classList.contains('tab-btn')) {
+        document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
+        e.target.classList.add('active');
+        
+        activeTab = e.target.getAttribute('data-tab');
+        renderTab(activeTab);
+      }
+    });
+
+    // Initialize
+    fetchData();
   </script>
 </body>
 </html>
