@@ -269,14 +269,26 @@
       return d.toISOString().split('T')[0];
     }
 
-    async function fetchData() {
+async function fetchData() {
       cardsContainer.innerHTML = `<div class="loading">Loading feed...</div>`;
       try {
         const requestUrl = new URL(WEB_APP_URL);
         requestUrl.searchParams.set("offset", dayOffset);
 
         const response = await fetch(requestUrl);
-        dataset = await response.json();
+        let rawData = await response.json();
+
+        // Debug log: Open F12 / Inspect -> Console to view exact JSON shape
+        console.log("Raw API Response:", rawData);
+
+        // Unwrap common parent properties if nested
+        if (rawData && typeof rawData === 'object' && !Array.isArray(rawData)) {
+          if (rawData.data) rawData = rawData.data;
+          else if (rawData.feed) rawData = rawData.feed;
+          else if (rawData.items) rawData = rawData.items;
+        }
+
+        dataset = rawData;
 
         if (dataset.error) {
           cardsContainer.innerHTML = `<div class="empty-state">${dataset.error}</div>`;
@@ -285,9 +297,53 @@
 
         renderTab(activeTab);
       } catch (error) {
+        console.error("Fetch Error:", error);
         cardsContainer.innerHTML = `<div class="empty-state">Unable to load feed. Check API URL & permissions.</div>`;
       }
     }
+
+    function renderTab(tabName) {
+      cardsContainer.innerHTML = '';
+      let items = [];
+
+      const targetCategory = tabName.trim().toLowerCase();
+
+      // Case A: Dataset is a flat array of item objects
+      if (Array.isArray(dataset)) {
+        items = dataset.filter(item => {
+          const cat = (item.category || item.tab || item.type || '').trim().toLowerCase();
+          return cat === targetCategory;
+        });
+      } 
+      // Case B: Dataset is an Object with tab keys { News: [...], Learn: [...] }
+      else if (dataset && typeof dataset === 'object') {
+        const matchingKey = Object.keys(dataset).find(
+          k => k.trim().toLowerCase() === targetCategory
+        );
+        items = matchingKey ? dataset[matchingKey] : [];
+      }
+
+      // Date Filtering (Soft check)
+      if (Array.isArray(items) && items.length > 0 && dayOffset !== 0) {
+        const targetDateStr = getTargetDateString(dayOffset);
+        const filtered = items.filter(item => {
+          if (!item.date) return true;
+          // Match standard ISO or partial date strings
+          return String(item.date).includes(targetDateStr);
+        });
+        if (filtered.length > 0) items = filtered;
+      }
+
+      if (!Array.isArray(items) || items.length === 0) {
+        cardsContainer.innerHTML = `<div class="empty-state">No items found under "${tabName}".</div>`;
+        return;
+      }
+
+      items.forEach(item => cardsContainer.appendChild(createCardElement(item)));
+      cardsContainer.scrollLeft = 0;
+    }
+
+    
 
     // Event Handlers
     tabNav.addEventListener('click', (e) => {
