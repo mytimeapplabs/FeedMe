@@ -3,57 +3,111 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Content Aggregator</title>
+  <title>FeedMe</title>
   <style>
     :root {
-      --bg-color: #f4f6f8;
-      --card-bg: #ffffff;
-      --text-primary: #1a1a1a;
-      --text-secondary: #4a5568;
-      --accent-color: #2563eb;
-      --border-color: #e2e8f0;
+      --bg-color: #0f172a;
+      --card-bg: #1e293b;
+      --text-primary: #f8fafc;
+      --text-secondary: #94a3b8;
+      --accent-color: #12a1a2;
+      --border-color: #334155;
     }
 
+    * { box-sizing: border-box; }
+
     body {
-      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
       background-color: var(--bg-color);
       color: var(--text-primary);
       margin: 0;
-      padding: 20px;
+      padding: 16px;
     }
 
-    .container {
-      max-width: 900px;
-      margin: 0 auto;
+    .container { max-width: 900px; margin: 0 auto; }
+
+    header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 20px;
+      padding-bottom: 12px;
+      border-bottom: 1px solid var(--border-color);
+    }
+
+    .brand {
+      font-size: 1.5rem;
+      font-weight: 800;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      color: var(--text-primary);
+    }
+
+    /* Day Navigation Controls (-1 / +1) */
+    .day-nav {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      background: var(--card-bg);
+      padding: 4px 8px;
+      border-radius: 20px;
+      border: 1px solid var(--border-color);
+    }
+
+    .day-btn {
+      background: none;
+      border: none;
+      color: var(--text-primary);
+      font-weight: bold;
+      font-size: 0.9rem;
+      padding: 4px 10px;
+      cursor: pointer;
+      border-radius: 12px;
+      transition: background 0.2s;
+    }
+
+    .day-btn:hover { background: rgba(255, 255, 255, 0.1); }
+    .day-btn:disabled { opacity: 0.3; cursor: not-allowed; }
+
+    .day-label {
+      font-size: 0.85rem;
+      color: var(--text-secondary);
+      font-weight: 600;
+      min-width: 75px;
+      text-align: center;
     }
 
     /* Tab Navigation */
     .tabs {
       display: flex;
-      gap: 10px;
+      gap: 8px;
       margin-bottom: 20px;
-      border-bottom: 2px solid var(--border-color);
-      padding-bottom: 10px;
     }
 
     .tab-btn {
-      padding: 8px 18px;
-      border: none;
-      background: #cbd5e1;
-      color: var(--text-primary);
-      border-radius: 6px;
+      flex: 1;
+      padding: 10px 14px;
+      border: 1px solid var(--border-color);
+      background: var(--card-bg);
+      color: var(--text-secondary);
+      border-radius: 12px;
       cursor: pointer;
       font-weight: 600;
-      font-size: 0.95rem;
-      transition: background 0.2s, color 0.2s;
+      font-size: 1rem;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+      transition: all 0.2s ease;
     }
 
     .tab-btn.active {
       background: var(--accent-color);
       color: #ffffff;
+      border-color: var(--accent-color);
     }
 
-    /* Cards Layout */
     .cards-grid {
       display: grid;
       grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
@@ -62,23 +116,19 @@
 
     .card {
       background: var(--card-bg);
-      border-radius: 10px;
+      border-radius: 12px;
       padding: 18px;
-      box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);
       border: 1px solid var(--border-color);
-      display: flex;
-      flex-direction: column;
     }
 
     .card-title {
       margin: 0 0 10px 0;
-      font-size: 1.15rem;
+      font-size: 1.1rem;
       font-weight: 700;
-      color: var(--text-primary);
       line-height: 1.3;
+      color: var(--text-primary);
     }
 
-    /* Important: Keeps line breaks intact and ensures text is visible */
     .card-body {
       margin: 0;
       font-size: 0.95rem;
@@ -92,60 +142,62 @@
 
     .loading, .empty-state {
       text-align: center;
-      padding: 40px;
+      padding: 40px 20px;
       color: var(--text-secondary);
       grid-column: 1 / -1;
     }
   </style>
 </head>
 <body>
-
   <div class="container">
-    <!-- Navigation Tabs -->
+    <header>
+      <div class="brand">⚡ FeedMe</div>
+      
+      <!-- Day Navigation (-1 / Today / +1) -->
+      <div class="day-nav">
+        <button id="prev-day-btn" class="day-btn" title="Yesterday">-1</button>
+        <span id="day-label" class="day-label">Today</span>
+        <button id="next-day-btn" class="day-btn" title="Today" disabled>+1</button>
+      </div>
+    </header>
+
     <nav class="tabs" id="tab-nav">
-      <button class="tab-btn active" data-tab="Learn">Learn</button>
-      <button class="tab-btn" data-tab="Life">Life</button>
+      <button class="tab-btn active" data-tab="News">📰 News</button>
+      <button class="tab-btn" data-tab="Learn">💡 Learn</button>
+      <button class="tab-btn" data-tab="Life">🌱 Life</button>
     </nav>
 
-    <!-- Cards Container -->
-    <div id="cards-container" class="cards-grid">
-      <div class="loading">Loading cards...</div>
-    </div>
+    <main id="cards-container" class="cards-grid">
+      <div class="loading">Loading feed...</div>
+    </main>
   </div>
 
   <script>
-    // Paste your Google Apps Script Web App Deployment URL here
+    // CONFIGURATION
     const WEB_APP_URL = "https://script.google.com/macros/s/AKfycbwjlWMzricTk_dQEthEhUiOXYOq3one9kmSb0NHe0U1IxgRdoYxNFdEkoMicIMQocdC/exec";
 
     let dataset = {};
-    let activeTab = "Learn";
+    let activeTab = "News";
+    let dayOffset = 0; // 0 = Today, -1 = Yesterday
 
     const cardsContainer = document.getElementById('cards-container');
     const tabNav = document.getElementById('tab-nav');
+    const prevDayBtn = document.getElementById('prev-day-btn');
+    const nextDayBtn = document.getElementById('next-day-btn');
+    const dayLabel = document.getElementById('day-label');
 
-    // Safe DOM construction preventing HTML syntax issues on newlines/quotes
+    // Safe DOM construction to handle multi-line text and unescaped quotes
     function createCardElement(item) {
-      const card = document.createElement('div');
+      const card = document.createElement('article');
       card.className = 'card';
 
-      // Title Key Fallbacks
       const title = document.createElement('h3');
       title.className = 'card-title';
-      title.textContent = item.title || item.name || item.topic || 'Untitled';
+      title.textContent = item.title || item.subject || item.topic || item.name || 'Untitled';
 
-      // Body Content Key Fallbacks (Covers common sheet header names)
       const body = document.createElement('p');
       body.className = 'card-body';
-      
-      const bodyContent = item.content 
-        || item.description 
-        || item.body 
-        || item.text 
-        || item.summary 
-        || item.notes 
-        || item.details 
-        || '';
-
+      const bodyContent = item.content || item.body || item.description || item.summary || item.text || item.notes || item.details || '';
       body.textContent = bodyContent ? bodyContent : 'No content available.';
 
       card.appendChild(title);
@@ -153,55 +205,97 @@
       return card;
     }
 
-    // Render cards based on active tab
+    function updateDayNavControls() {
+      if (dayOffset === 0) {
+        dayLabel.textContent = "Today";
+        nextDayBtn.disabled = true;
+      } else if (dayOffset === -1) {
+        dayLabel.textContent = "Yesterday";
+        nextDayBtn.disabled = false;
+      } else {
+        dayLabel.textContent = `${dayOffset} Days`;
+        nextDayBtn.disabled = false;
+      }
+    }
+
     function renderTab(tabName) {
       cardsContainer.innerHTML = '';
 
-      // Match tab name case-insensitively
+      // Case-insensitive matching for sheet tab names
       const matchingKey = Object.keys(dataset).find(
-        key => key.trim().toLowerCase() === tabName.trim().toLowerCase()
+        k => k.trim().toLowerCase() === tabName.trim().toLowerCase()
       );
+      
+      let items = matchingKey ? dataset[matchingKey] : [];
 
-      const items = matchingKey ? dataset[matchingKey] : (Array.isArray(dataset) ? dataset : []);
+      // Optional date filtering if date field exists
+      if (Array.isArray(items) && items.length > 0 && dayOffset !== 0) {
+        const targetDateStr = getTargetDateString(dayOffset);
+        const filtered = items.filter(item => {
+          if (!item.date) return true;
+          return item.date.includes(targetDateStr);
+        });
+        // Fall back to full list if filtered date set is empty
+        if (filtered.length > 0) items = filtered;
+      }
 
       if (!items || items.length === 0) {
-        cardsContainer.innerHTML = `<div class="empty-state">No items found under ${tabName}.</div>`;
+        cardsContainer.innerHTML = `<div class="empty-state">No items found under "${tabName}".</div>`;
         return;
       }
 
-      items.forEach(item => {
-        cardsContainer.appendChild(createCardElement(item));
-      });
+      items.forEach(item => cardsContainer.appendChild(createCardElement(item)));
     }
 
-    // Fetch payload from Apps Script
+    function getTargetDateString(offsetDays) {
+      const d = new Date();
+      d.setDate(d.getDate() + offsetDays);
+      return d.toISOString().split('T')[0]; // YYYY-MM-DD
+    }
+
     async function fetchData() {
+      cardsContainer.innerHTML = `<div class="loading">Loading feed...</div>`;
       try {
-        const response = await fetch(WEB_APP_URL);
-        const data = await response.json();
-        
-        console.log("Raw API Response:", data); // Inspect structure in browser console
-        
-        dataset = data;
+        const response = await fetch(`${WEB_APP_URL}&offset=${dayOffset}`);
+        dataset = await response.json();
+
+        if (dataset.error) {
+          cardsContainer.innerHTML = `<div class="empty-state">${dataset.error}</div>`;
+          return;
+        }
+
         renderTab(activeTab);
       } catch (error) {
-        console.error("Fetch Error:", error);
-        cardsContainer.innerHTML = `<div class="empty-state">Error loading content. Please check Web App URL permissions.</div>`;
+        cardsContainer.innerHTML = `<div class="empty-state">Unable to load feed. Check API URL & key.</div>`;
       }
     }
 
-    // Tab switching event listener
+    // Event Handlers
     tabNav.addEventListener('click', (e) => {
-      if (e.target.classList.contains('tab-btn')) {
-        document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
-        e.target.classList.add('active');
-        
-        activeTab = e.target.getAttribute('data-tab');
+      const btn = e.target.closest('.tab-btn');
+      if (btn) {
+        document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+        activeTab = btn.getAttribute('data-tab');
         renderTab(activeTab);
       }
     });
 
-    // Initialize
+    prevDayBtn.addEventListener('click', () => {
+      dayOffset -= 1;
+      updateDayNavControls();
+      fetchData();
+    });
+
+    nextDayBtn.addEventListener('click', () => {
+      if (dayOffset < 0) {
+        dayOffset += 1;
+        updateDayNavControls();
+        fetchData();
+      }
+    });
+
+    // Initial Load
     fetchData();
   </script>
 </body>
