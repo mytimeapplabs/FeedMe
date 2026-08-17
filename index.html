@@ -173,8 +173,8 @@
   </div>
 
   <script>
-    // CONFIGURATION
-    const WEB_APP_URL = "https://script.google.com/macros/s/AKfycbwjlWMzricTk_dQEthEhUiOXYOq3one9kmSb0NHe0U1IxgRdoYxNFdEkoMicIMQocdC/exec";
+    // ONLY CHANGE THIS URL STRING
+    const WEB_APP_URL = "https://script.google.com/macros/library/d/15-k_Fdc0bLUBKFwVGkPQEDAc-rmZ3Gr7coSHU8FndNJnpOvXyHIODG2G/4";
 
     let dataset = {};
     let activeTab = "News";
@@ -186,7 +186,6 @@
     const nextDayBtn = document.getElementById('next-day-btn');
     const dayLabel = document.getElementById('day-label');
 
-    // Safe DOM construction to handle multi-line text and unescaped quotes
     function createCardElement(item) {
       const card = document.createElement('article');
       card.className = 'card';
@@ -221,21 +220,18 @@
     function renderTab(tabName) {
       cardsContainer.innerHTML = '';
 
-      // Case-insensitive matching for sheet tab names
       const matchingKey = Object.keys(dataset).find(
         k => k.trim().toLowerCase() === tabName.trim().toLowerCase()
       );
       
       let items = matchingKey ? dataset[matchingKey] : [];
 
-      // Optional date filtering if date field exists
       if (Array.isArray(items) && items.length > 0 && dayOffset !== 0) {
         const targetDateStr = getTargetDateString(dayOffset);
         const filtered = items.filter(item => {
           if (!item.date) return true;
           return item.date.includes(targetDateStr);
         });
-        // Fall back to full list if filtered date set is empty
         if (filtered.length > 0) items = filtered;
       }
 
@@ -250,13 +246,17 @@
     function getTargetDateString(offsetDays) {
       const d = new Date();
       d.setDate(d.getDate() + offsetDays);
-      return d.toISOString().split('T')[0]; // YYYY-MM-DD
+      return d.toISOString().split('T')[0];
     }
 
     async function fetchData() {
       cardsContainer.innerHTML = `<div class="loading">Loading feed...</div>`;
       try {
-        const response = await fetch(`${WEB_APP_URL}&offset=${dayOffset}`);
+        // Safe URL parameter appending
+        const requestUrl = new URL(WEB_APP_URL);
+        requestUrl.searchParams.set("offset", dayOffset);
+
+        const response = await fetch(requestUrl);
         dataset = await response.json();
 
         if (dataset.error) {
@@ -266,7 +266,7 @@
 
         renderTab(activeTab);
       } catch (error) {
-        cardsContainer.innerHTML = `<div class="empty-state">Unable to load feed. Check API URL & key.</div>`;
+        cardsContainer.innerHTML = `<div class="empty-state">Unable to load feed. Check API URL & permissions.</div>`;
       }
     }
 
@@ -295,7 +295,6 @@
       }
     });
 
-    // Initial Load
     fetchData();
   </script>
 </body>
