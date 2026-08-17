@@ -5,12 +5,12 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
   <title>FeedMe</title>
   
-  <!-- PWA Manifest & Icons -->
+  <!-- PWA Manifest & App Icons (Lightning Bolt ⚡) -->
   <link rel="manifest" href="data:application/manifest+json;base64,ewogICJuYW1lIjogIkZlZWRNZSIsCiAgInNob3J0X25hbWUiOiAiRmVlZE1lIiwKICAic3RhcnRfdXJsIjogIi4iLAogICJkaXNwbGF5IjogInN0YW5kYWxvbmUiLAogICJiYWNrZ3JvdW5kX2NvbG9yIjogIiMxMmExYTIiLAogICJ0aGVtZV9jb2xvciI6ICIxMmExYTIiCiB9">
-  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' rx='20' fill='%2312a1a2'/><text x='50%' y='65%' font-size='55' text-anchor='middle' fill='white'>🍽️</text></svg>">
-  <link rel="apple-touch-icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' rx='20' fill='%2312a1a2'/><text x='50%' y='65%' font-size='55' text-anchor='middle' fill='white'>🍽️</text></svg>">
+  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' rx='20' fill='%2312a1a2'/><text x='50%' y='68%' font-size='55' text-anchor='middle' fill='white'>⚡</text></svg>">
+  <link rel="apple-touch-icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' rx='20' fill='%2312a1a2'/><text x='50%' y='68%' font-size='55' text-anchor='middle' fill='white'>⚡</text></svg>">
 
-  <!-- Swiper.js Stylesheet -->
+  <!-- Swiper.js CSS -->
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.css" />
 
   <style>
@@ -25,74 +25,90 @@
     }
 
     * { box-sizing: border-box; margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; }
-    body { background-color: var(--bg-color); color: var(--text-main); display: flex; flex-direction: column; height: 100vh; overflow: hidden; }
+    body { background-color: var(--bg-color); color: var(--text-main); display: flex; flex-direction: column; height: 100vh; height: 100dvh; overflow: hidden; }
 
     header {
       display: flex;
       justify-content: space-between;
       align-items: center;
-      padding: 12px 16px;
+      padding: 10px 14px;
       background-color: #090d16;
       border-bottom: 1px solid var(--border-color);
       flex-shrink: 0;
     }
 
-    .brand { font-weight: 700; font-size: 1.1rem; color: var(--accent); }
+    .brand { font-weight: 700; font-size: 1.1rem; color: var(--accent); display: flex; align-items: center; gap: 4px; }
     
-    .tab-bar { display: flex; gap: 8px; }
+    .tab-bar { display: flex; gap: 6px; }
+    
+    /* Reduced tab icons size by ~15% */
     .tab-btn {
       background: var(--card-bg);
       border: 1px solid var(--border-color);
-      font-size: 1.3rem;
-      padding: 6px 14px;
+      font-size: 1.1rem;
+      padding: 5px 12px;
       border-radius: 20px;
       cursor: pointer;
       transition: all 0.2s ease;
     }
     .tab-btn.active { background: var(--accent); border-color: var(--accent); }
 
-    .history-controls { display: flex; gap: 6px; }
+    .history-controls { display: flex; align-items: center; min-width: 40px; justify-content: flex-end; }
+    
     .nav-btn {
       background: var(--card-bg);
       border: 1px solid var(--border-color);
       color: var(--text-main);
-      padding: 4px 10px;
-      border-radius: 6px;
+      padding: 5px 12px;
+      border-radius: 8px;
       font-size: 0.85rem;
       cursor: pointer;
-      font-weight: 600;
+      font-weight: 700;
+      transition: background 0.2s;
     }
-    .nav-btn:disabled { opacity: 0.3; cursor: not-allowed; }
+    .nav-btn:active { background: var(--accent); }
 
-    main { flex: 1; display: flex; flex-direction: column; padding: 12px; overflow: hidden; position: relative; }
+    main { flex: 1; display: flex; flex-direction: column; padding: 10px 12px 14px 12px; overflow: hidden; min-height: 0; }
     
-    .date-indicator { text-align: center; font-size: 0.8rem; color: var(--text-sub); margin-bottom: 10px; flex-shrink: 0; }
+    .date-indicator { text-align: center; font-size: 0.8rem; color: var(--text-sub); margin-bottom: 8px; flex-shrink: 0; }
 
-    /* Swiper Deck Layout */
-    .swiper { width: 100%; height: calc(100vh - 120px); max-width: 480px; margin: 0 auto; }
+    /* Swiper Container & Layout Fixes */
+    .swiper { width: 100%; height: 100%; max-width: 480px; margin: 0 auto; }
+    
     .swiper-slide {
       background: var(--card-bg);
       border: 1px solid var(--border-color);
       border-radius: 16px;
-      padding: 20px;
+      padding: 16px;
       display: flex;
       flex-direction: column;
-      justify-content: space-between;
       box-shadow: 0 10px 25px rgba(0,0,0,0.5);
-      overflow-y: auto;
+      height: 100%;
+      box-sizing: border-box;
     }
 
-    .card-header { margin-bottom: 12px; }
-    .card-title { font-size: 1.15rem; font-weight: 700; color: var(--text-main); line-height: 1.35; margin-bottom: 6px; }
+    .card-header { flex-shrink: 0; margin-bottom: 10px; }
+    .card-title { font-size: 1.1rem; font-weight: 700; color: var(--text-main); line-height: 1.35; margin-bottom: 4px; }
     .card-source { font-size: 0.8rem; color: var(--accent); font-weight: 600; }
-    .card-body { font-size: 0.92rem; color: var(--text-sub); line-height: 1.55; white-space: pre-line; flex-grow: 1; }
+    
+    /* Scrollable body content so footer remains grounded */
+    .card-body { 
+      font-size: 0.9rem; 
+      color: var(--text-sub); 
+      line-height: 1.5; 
+      white-space: pre-line; 
+      flex: 1; 
+      overflow-y: auto; 
+      padding-right: 4px;
+      margin-bottom: 8px;
+    }
 
+    /* Fixed Card Footer & Visible Checkmark */
     .card-footer {
       display: flex;
       justify-content: flex-end;
       align-items: center;
-      padding-top: 14px;
-      margin-top: 12px;
+      padding-top: 10px;
       border-top: 1px solid rgba(255, 255, 255, 0.08);
       flex-shrink: 0;
     }
@@ -102,14 +118,15 @@
       border: 1px solid var(--border-color);
       color: var(--text-sub);
       border-radius: 50%;
-      width: 42px;
-      height: 42px;
+      width: 44px;
+      height: 44px;
       display: flex;
       align-items: center;
       justify-content: center;
-      font-size: 1.3rem;
+      font-size: 1.2rem;
       cursor: pointer;
       transition: all 0.2s ease;
+      flex-shrink: 0;
     }
 
     .check-btn.read {
@@ -124,15 +141,15 @@
 <body>
 
   <header>
-    <div class="brand">🍽️ FeedMe</div>
+    <div class="brand">⚡ FeedMe</div>
     <div class="tab-bar">
       <button class="tab-btn active" onclick="switchTab('news')" title="News">📰</button>
       <button class="tab-btn" onclick="switchTab('learn')" title="Learn">💡</button>
       <button class="tab-btn" onclick="switchTab('life')" title="Life">🌱</button>
     </div>
     <div class="history-controls">
-      <button class="nav-btn" onclick="navigateDay(-1)">-1</button>
-      <button class="nav-btn" id="next-btn" onclick="navigateDay(1)" disabled>+1</button>
+      <!-- Dynamic single toggle button (-1 or +1) -->
+      <button class="nav-btn" id="date-toggle-btn" onclick="togglePriorDay()">-1</button>
     </div>
   </header>
 
@@ -144,16 +161,16 @@
     </div>
   </main>
 
-  <!-- Swiper.js Library -->
+  <!-- Swiper.js Script -->
   <script src="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.js"></script>
 
   <script>
-    // 👈 LINE 142: Set Web App Deployment URL here
+    // Enter your Web App Deployment URL here if running standalone/GitHub Pages
     const WEB_APP_URL = "https://script.google.com/macros/s/AKfycbwjlWMzricTk_dQEthEhUiOXYOq3one9kmSb0NHe0U1IxgRdoYxNFdEkoMicIMQocdC/exec";
 
     let currentFeedData = { news: [], learn: [], life: [] };
     let currentTab = 'news';
-    let currentDateOffset = 0;
+    let currentDateOffset = 0; // Strictly 0 (Today) or -1 (Yesterday)
     let readCardIds = new Set();
     let swiperInstance = null;
 
@@ -169,9 +186,19 @@
       renderCardsDeck();
     }
 
-    function navigateDay(offsetChange) {
-      currentDateOffset += offsetChange;
-      document.getElementById('next-btn').disabled = (currentDateOffset >= 0);
+    function togglePriorDay() {
+      // Toggle offset strictly between 0 and -1
+      currentDateOffset = (currentDateOffset === 0) ? -1 : 0;
+      
+      const toggleBtn = document.getElementById('date-toggle-btn');
+      if (currentDateOffset === 0) {
+        toggleBtn.innerText = "-1";
+        toggleBtn.title = "Go to Yesterday's Feed";
+      } else {
+        toggleBtn.innerText = "+1";
+        toggleBtn.title = "Return to Today's Feed";
+      }
+      
       loadFeedForOffset(currentDateOffset);
     }
 
@@ -183,7 +210,7 @@
 
     function loadFeedForOffset(offset) {
       const dateStr = offset === 0 ? '' : getDateStrForOffset(offset);
-      document.getElementById('date-label').innerText = `Loading (${dateStr || 'Today'})...`;
+      document.getElementById('date-label').innerText = `Loading (${offset === 0 ? 'Today' : 'Yesterday'})...`;
 
       if (typeof google !== 'undefined' && google.script && google.script.run) {
         google.script.run
@@ -201,7 +228,8 @@
     function onDataLoaded(data) {
       currentFeedData = data || { news: [], learn: [], life: [] };
       const displayDate = data && data.date ? data.date : getDateStrForOffset(currentDateOffset);
-      document.getElementById('date-label').innerText = `Feed for: ${displayDate}`;
+      const labelPrefix = currentDateOffset === 0 ? 'Today' : 'Yesterday';
+      document.getElementById('date-label').innerText = `${labelPrefix} (${displayDate})`;
       renderCardsDeck();
     }
 
@@ -217,7 +245,7 @@
       const cards = currentFeedData[currentTab] || [];
 
       if (cards.length === 0) {
-        wrapper.innerHTML = `<div class="empty-state">No items in this category for today.</div>`;
+        wrapper.innerHTML = `<div class="empty-state">No items in this category for ${currentDateOffset === 0 ? 'today' : 'yesterday'}.</div>`;
         return;
       }
 
@@ -242,7 +270,7 @@
         wrapper.appendChild(slide);
       });
 
-      // Initialize Swiper deck
+      // Swiper card stack initialization
       swiperInstance = new Swiper('.swiper', {
         effect: 'cards',
         grabCursor: true,
