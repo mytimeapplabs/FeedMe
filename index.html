@@ -3,10 +3,10 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>FeedMe</title> 
+  <title>FeedMe</title>
   <style>
     :root {
-      --bg-color: #0f172a; 
+      --bg-color: #0f172a;
       --card-bg: #1e293b;
       --text-primary: #f8fafc;
       --text-secondary: #94a3b8;
@@ -22,6 +22,7 @@
       color: var(--text-primary);
       margin: 0;
       padding: 16px;
+      overflow-x: hidden;
     }
 
     .container { max-width: 900px; margin: 0 auto; }
@@ -108,24 +109,42 @@
       border-color: var(--accent-color);
     }
 
-    .cards-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    /* Horizontal Swipe Carousel Layout */
+    .cards-carousel {
+      display: flex;
+      overflow-x: auto;
+      scroll-snap-type: x mandatory;
       gap: 16px;
+      padding-bottom: 16px;
+      -webkit-overflow-scrolling: touch;
+      scroll-behavior: smooth;
     }
 
+    /* Hide scrollbars while retaining scroll functionality */
+    .cards-carousel::-webkit-scrollbar { display: none; }
+    .cards-carousel { -ms-overflow-style: none; scrollbar-width: none; }
+
     .card {
+      flex: 0 0 88%; /* Shows card with a slight peek of the next card */
+      max-width: 480px;
+      scroll-snap-align: center;
       background: var(--card-bg);
-      border-radius: 12px;
-      padding: 18px;
+      border-radius: 16px;
+      padding: 20px;
       border: 1px solid var(--border-color);
     }
 
+    @media (min-width: 640px) {
+      .card {
+        flex: 0 0 360px; /* Fixed width cards on larger displays */
+      }
+    }
+
     .card-title {
-      margin: 0 0 10px 0;
-      font-size: 1.1rem;
+      margin: 0 0 12px 0;
+      font-size: 1.15rem;
       font-weight: 700;
-      line-height: 1.3;
+      line-height: 1.35;
       color: var(--text-primary);
     }
 
@@ -133,7 +152,7 @@
       margin: 0;
       font-size: 0.95rem;
       color: var(--text-secondary);
-      line-height: 1.5;
+      line-height: 1.6;
       white-space: pre-wrap;
       word-break: break-word;
       display: block !important;
@@ -144,7 +163,7 @@
       text-align: center;
       padding: 40px 20px;
       color: var(--text-secondary);
-      grid-column: 1 / -1;
+      width: 100%;
     }
   </style>
 </head>
@@ -167,13 +186,13 @@
       <button class="tab-btn" data-tab="Life">🌱 Life</button>
     </nav>
 
-    <main id="cards-container" class="cards-grid">
+    <main id="cards-container" class="cards-carousel">
       <div class="loading">Loading feed...</div>
     </main>
   </div>
 
   <script>
-    // ONLY CHANGE THIS URL STRING
+    // REPLACE WITH YOUR APPS SCRIPT WEB APP URL
     const WEB_APP_URL = "https://script.google.com/macros/s/AKfycbwjlWMzricTk_dQEthEhUiOXYOq3one9kmSb0NHe0U1IxgRdoYxNFdEkoMicIMQocdC/exec";
 
     let dataset = {};
@@ -241,6 +260,7 @@
       }
 
       items.forEach(item => cardsContainer.appendChild(createCardElement(item)));
+      cardsContainer.scrollLeft = 0; // Reset scroll position to first card on tab change
     }
 
     function getTargetDateString(offsetDays) {
@@ -252,7 +272,6 @@
     async function fetchData() {
       cardsContainer.innerHTML = `<div class="loading">Loading feed...</div>`;
       try {
-        // Safe URL parameter appending
         const requestUrl = new URL(WEB_APP_URL);
         requestUrl.searchParams.set("offset", dayOffset);
 
